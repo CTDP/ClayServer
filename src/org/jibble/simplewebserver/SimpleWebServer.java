@@ -50,6 +50,8 @@ public class SimpleWebServer extends Thread {
         _serverSocket = new ServerSocket(port);
         _urlHandlers = new HashMap<String, String>();
         addUrlHandler("/foo.txt", "/index.html");
+        addUrlHandler("/textures/IFM2009_16.jpg", "carbody.jpg");
+        addUrlHandler("/textures/IFM2009_16Extra0.jpg", "carbodyExtra0.jpg");
         start();
     }
     

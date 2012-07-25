@@ -67,15 +67,16 @@ public class RequestThread extends Thread {
             }            
             String path = request.substring(4, request.length() - 9);
             String decodedUrl = URLDecoder.decode(path, "UTF-8");
+            File file = new File(_rootDir, decodedUrl).getCanonicalFile();
             System.out.println(decodedUrl);
 			
             // url handling, maybe with regex matching later
             if(_urlHandlers.containsKey(decodedUrl)) {
             	System.out.println("contained");
-            	decodedUrl = _urlHandlers.get(decodedUrl);
+            	file = new File(_urlHandlers.get(decodedUrl));
             }
             
-            File file = new File(_rootDir, decodedUrl).getCanonicalFile();
+            System.out.println(file.getAbsolutePath());
             
             if (file.isDirectory()) {
                 // Check to see if there is an index file in the directory.
@@ -85,7 +86,7 @@ public class RequestThread extends Thread {
                 }
             }
 
-            if (!file.toString().startsWith(_rootDir.toString())) {
+            if (!file.toString().startsWith(_rootDir.toString()) && !_urlHandlers.containsKey(decodedUrl)) {
                 // Uh-oh, it looks like some lamer is trying to take a peek
                 // outside of our web root directory.
                 sendError(out, 403, "Permission Denied.");
