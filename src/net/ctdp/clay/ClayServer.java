@@ -29,7 +29,7 @@ public class ClayServer {
 		int port = 20042;
 		boolean recursive = true;
 		SimpleWebServer server = new SimpleWebServer(documentRoot, port);
-
+		
 		InetAddress thisIp =InetAddress.getLocalHost();
 		String url = "http://"+thisIp.getHostAddress()+":"+port+"/";
 		System.out.println("IP:"+thisIp.getHostAddress());
