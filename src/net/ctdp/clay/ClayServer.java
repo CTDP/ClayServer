@@ -20,6 +20,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import net.ctdp.clay.io.ConfigParser;
+import net.ctdp.clay.io.Configuration;
+
 import org.jibble.simplewebserver.SimpleWebServer;
 
 public class ClayServer {
@@ -31,10 +34,14 @@ public class ClayServer {
 	public static void main(String[] args) throws IOException {
 
 		// read config
+		InputStream configIS = ClayServer.class.getResourceAsStream("/res/config.ini");
+		ConfigParser configParser = new ConfigParser();
+		configParser.parse(configIS);
+		Configuration configuration = configParser.getConfig(); 
 		
 		File documentRoot = new File("./htdocs/");
-		int port = 20042;
-		SimpleWebServer server = new SimpleWebServer(documentRoot, port);
+		int port = configuration.port;
+		SimpleWebServer server = new SimpleWebServer(documentRoot, port, configuration.urlHandlers);
 		
 		InetAddress thisIp =InetAddress.getLocalHost();
 		String url = "http://"+thisIp.getHostAddress()+":"+port+"/";

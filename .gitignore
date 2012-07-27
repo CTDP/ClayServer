@@ -1,11 +1,3 @@
 *.DS_Store
-DDSUtils/bin
-DDSUtils/build
-DDSUtils/test/output
-Dropps/bin
-Dropps/build
-Badds/bin
-Badds/build
-Radds/bin
-Radds/build
+bin
 *Alias*
