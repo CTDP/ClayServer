@@ -16,18 +16,31 @@ $Id: ServerSideScriptEngine.java,v 1.4 2004/02/01 13:37:35 pjm2 Exp $
 
 package org.jibble.simplewebserver;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.Socket;
+import java.net.URLDecoder;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * Copyright Paul Mutton
  * http://www.jibble.org/
+ * 
+ * modified Daniel Senff
  *
  */
 public class RequestThread extends Thread {
     
-	public RequestThread(Socket socket, File rootDir, Map<String, String> urlHandlers) {
+	public RequestThread(Socket socket, File rootDir, Map<String, String> urlHandlers, boolean readFromJar) {
+		_readFromJar = readFromJar;
         _socket = socket;
         _rootDir = rootDir;
         _urlHandlers = urlHandlers;
@@ -67,70 +80,11 @@ public class RequestThread extends Thread {
             }            
             String path = request.substring(4, request.length() - 9);
             String decodedUrl = URLDecoder.decode(path, "UTF-8");
-            File file = new File(_rootDir, decodedUrl).getCanonicalFile();
-            System.out.println(decodedUrl);
-			
-            // url handling, maybe with regex matching later
-            if(_urlHandlers.containsKey(decodedUrl)) {
-            	System.out.println("contained");
-            	file = new File(_urlHandlers.get(decodedUrl));
-            }
             
-            System.out.println(file.getAbsolutePath());
-            
-            if (file.isDirectory()) {
-                // Check to see if there is an index file in the directory.
-                File indexFile = new File(file, "index.html");
-                if (indexFile.exists() && !indexFile.isDirectory()) {
-                    file = indexFile;
-                }
-            }
-
-            if (!file.toString().startsWith(_rootDir.toString()) && !_urlHandlers.containsKey(decodedUrl)) {
-                // Uh-oh, it looks like some lamer is trying to take a peek
-                // outside of our web root directory.
-                sendError(out, 403, "Permission Denied.");
-            }
-            else if (!file.exists()) {
-                // The file was not found.
-                sendError(out, 404, "File Not Found.");
-            }
-            else if (file.isDirectory()) {
-                // print directory listing
-                if (!path.endsWith("/")) {
-                    path = path + "/";
-                }
-                File[] files = file.listFiles();
-                sendHeader(out, 200, "text/html", -1, System.currentTimeMillis());
-                String title = "Index of " + path;
-                out.write(("<html><head><title>" + title + "</title></head><body><h3>Index of " + path + "</h3><p>\n").getBytes());
-                for (int i = 0; i < files.length; i++) {
-                    file = files[i];
-                    String filename = file.getName();
-                    String description = "";
-                    if (file.isDirectory()) {
-                        description = "&lt;DIR&gt;";
-                    }
-                    out.write(("<a href=\"" + path + filename + "\">" + filename + "</a> " + description + "<br>\n").getBytes());
-                }
-                out.write(("</p><hr><p>" + SimpleWebServer.VERSION + "</p></body><html>").getBytes());
-            }
-            else {
-                reader = new BufferedInputStream(new FileInputStream(file));
-            
-                String contentType = (String)SimpleWebServer.MIME_TYPES.get(SimpleWebServer.getExtension(file));
-                if (contentType == null) {
-                    contentType = "application/octet-stream";
-                }
-                
-                sendHeader(out, 200, contentType, file.length(), file.lastModified());
-                
-                byte[] buffer = new byte[4096];
-                int bytesRead;
-                while ((bytesRead = reader.read(buffer)) != -1) {
-                    out.write(buffer, 0, bytesRead);
-                }
-                reader.close();
+            if(_readFromJar) {
+            	handleInputStream(reader, out, path, decodedUrl);
+            } else {
+            	handleFile(reader, out, path, decodedUrl);
             }
             out.flush();
             out.close();
@@ -144,9 +98,120 @@ public class RequestThread extends Thread {
                     // Do nothing.
                 }
             }
+            e.printStackTrace();
         }
     }
+
+	private void handleInputStream(InputStream reader,
+			BufferedOutputStream out, 
+			String path, 
+			String decodedUrl) throws IOException {
+		if(decodedUrl.equals("/")) {
+			decodedUrl = "/index.html";
+		}
+		
+		
+		InputStream is = RequestThread.class.getResourceAsStream(decodedUrl);
+		String contentType = null;
+		
+		try {
+			reader = new BufferedInputStream(is);
+			String extension = decodedUrl.substring(decodedUrl.lastIndexOf("."), decodedUrl.length());
+			contentType = (String)SimpleWebServer.MIME_TYPES.get(extension);
+		} catch(Exception e) {
+			sendError(out, 404, "File Not Found.");
+		} 
+	    
+	    if (contentType == null) {
+	        contentType = "application/octet-stream";
+	    }
+	    
+	    System.out.println("Send header");
+	    
+	    sendHeader(out, 200, contentType, -1, System.currentTimeMillis());
+	    System.out.println("header sent");
+	    byte[] buffer = new byte[4096];
+	    int bytesRead;
+	    while ((bytesRead = reader.read(buffer)) != -1) {
+	    	System.out.println(bytesRead);
+	    	System.out.println(buffer);
+	        out.write(buffer, 0, bytesRead);
+	    }
+	    System.out.println("done");
+	    reader.close();
+		
+	}
+
+	private void handleFile(InputStream reader,
+			BufferedOutputStream out, 
+			String path, 
+			String decodedUrl)
+			throws IOException, FileNotFoundException {
+		File file = new File(_rootDir, decodedUrl).getCanonicalFile();
+		// url handling, maybe with regex matching later
+		if(_urlHandlers.containsKey(decodedUrl)) {
+			file = new File(_urlHandlers.get(decodedUrl));
+		}
+		
+		System.out.println(file.getAbsolutePath());
+		
+		if (file.isDirectory()) {
+		    // Check to see if there is an index file in the directory.
+		    File indexFile = new File(file, "index.html");
+		    if (indexFile.exists() && !indexFile.isDirectory()) {
+		        file = indexFile;
+		    }
+		}
+
+		if (!file.toString().startsWith(_rootDir.toString()) && !_urlHandlers.containsKey(decodedUrl)) {
+		    // Uh-oh, it looks like some lamer is trying to take a peek
+		    // outside of our web root directory.
+		    sendError(out, 403, "Permission Denied.");
+		}
+		else if (!file.exists()) {
+		    // The file was not found.
+		    sendError(out, 404, "File Not Found.");
+		}
+		else if (file.isDirectory()) {
+		    // print directory listing
+		    if (!path.endsWith("/")) {
+		        path = path + "/";
+		    }
+		    File[] files = file.listFiles();
+		    sendHeader(out, 200, "text/html", -1, System.currentTimeMillis());
+		    String title = "Index of " + path;
+		    out.write(("<html><head><title>" + title + "</title></head><body><h3>Index of " + path + "</h3><p>\n").getBytes());
+		    for (int i = 0; i < files.length; i++) {
+		        file = files[i];
+		        String filename = file.getName();
+		        String description = "";
+		        if (file.isDirectory()) {
+		            description = "&lt;DIR&gt;";
+		        }
+		        out.write(("<a href=\"" + path + filename + "\">" + filename + "</a> " + description + "<br>\n").getBytes());
+		    }
+		    out.write(("</p><hr><p>" + SimpleWebServer.VERSION + "</p></body><html>").getBytes());
+		}
+		else {
+		    reader = new BufferedInputStream(new FileInputStream(file));
+		
+		    String contentType = (String)SimpleWebServer.MIME_TYPES.get(SimpleWebServer.getExtension(file));
+		    if (contentType == null) {
+		        contentType = "application/octet-stream";
+		    }
+		    
+		    sendHeader(out, 200, contentType, file.length(), file.lastModified());
+		    
+		    byte[] buffer = new byte[4096];
+		    int bytesRead;
+		    while ((bytesRead = reader.read(buffer)) != -1) {
+		        out.write(buffer, 0, bytesRead);
+		    }
+		    reader.close();
+		}
+	}
     
+	private boolean _readFromJar;
     private Map<String, String> _urlHandlers;
     private File _rootDir;
     private Socket _socket;

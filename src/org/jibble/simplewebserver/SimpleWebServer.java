@@ -23,6 +23,8 @@ import java.util.*;
 /**
  * Copyright Paul Mutton
  * http://www.jibble.org/
+ * 
+ * modified Daniel Senff
  *
  */
 public class SimpleWebServer extends Thread {
@@ -44,8 +46,8 @@ public class SimpleWebServer extends Thread {
     
     public SimpleWebServer(File rootDir, int port) throws IOException {
         _rootDir = rootDir.getCanonicalFile();
-        if (!_rootDir.isDirectory()) {
-            throw new IOException("Not a directory.");
+        if (!rootDir.isDirectory()) {
+            _readFromJar = false;
         }
         _serverSocket = new ServerSocket(port);
         _urlHandlers = new HashMap<String, String>();
@@ -63,7 +65,7 @@ public class SimpleWebServer extends Thread {
         while (_running) {
             try {
                 Socket socket = _serverSocket.accept();
-                RequestThread requestThread = new RequestThread(socket, _rootDir, _urlHandlers);
+                RequestThread requestThread = new RequestThread(socket, _rootDir, _urlHandlers, _readFromJar);
                 requestThread.start();
             }
             catch (IOException e) {
@@ -93,6 +95,7 @@ public class SimpleWebServer extends Thread {
         }
     }
     
+    private boolean _readFromJar = true;
     private HashMap<String, String> _urlHandlers;
     private File _rootDir;
     private ServerSocket _serverSocket;
