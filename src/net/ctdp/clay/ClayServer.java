@@ -50,8 +50,13 @@ public class ClayServer {
 
 		JPanel panel = new JPanel();
 		
-		panel.add(new JLabel("<html><p>Open the Webbrowser to start the carviewer." +
-				"<p>The "));
+		panel.add(new JLabel("<html><p>Welcome to the Clay carviewer. " +
+				"<p><p>However, this is not the viewer. The viewer is an <br>" +
+				"interactive website that previews the model in your browser.<br>" +
+				"This tool starts the server to run this website." +
+				"<p><p>Open the viewer by visiting the URL address below." +
+				"<p><p>Note, you can use this url from any device within your network.<br>" +
+				"Try preview on your mobile device."));
 		panel.add(new JTextField(url));
 		JButton startViewerButton = new JButton("Open Viewer");
 		startViewerButton.addActionListener(new ActionListener() {
