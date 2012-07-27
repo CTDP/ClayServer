@@ -1,14 +1,19 @@
 package net.ctdp.clay;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,9 +30,10 @@ public class ClayServer {
 	 */
 	public static void main(String[] args) throws IOException {
 
+		// read config
+		
 		File documentRoot = new File("./htdocs/");
 		int port = 20042;
-		boolean recursive = true;
 		SimpleWebServer server = new SimpleWebServer(documentRoot, port);
 		
 		InetAddress thisIp =InetAddress.getLocalHost();
@@ -45,19 +51,36 @@ public class ClayServer {
 	}
 
 	private static void startGUI(final String url) {
-		JFrame frame = new JFrame("Clay Server");
-		frame.setPreferredSize(new Dimension(300, 200));
-
-		JPanel panel = new JPanel();
+		JFrame frame = new JFrame("Clay Server for CTDP IFM 2009");
+		frame.setPreferredSize(new Dimension(820, 320));
+		frame.setLayout(new BorderLayout());
 		
-		panel.add(new JLabel("<html><p>Welcome to the Clay carviewer. " +
+		JPanel intro = new JPanel();
+		intro.setLayout(new BorderLayout());
+		intro.setBackground(Color.WHITE);
+		try {
+			InputStream is = ClayServer.class.getResourceAsStream("/res/intro.jpg");
+			ImageIcon imageIcon = new ImageIcon(ImageIO.read(is));
+			intro.add(new JLabel(imageIcon), BorderLayout.LINE_START);
+		} catch (IOException ex) {
+			
+		}
+		String description = "<html><p><b>Welcome to the Clay car viewer for CTDP IFM 2009.</b>" +
 				"<p><p>However, this is not the viewer. The viewer is an <br>" +
 				"interactive website that previews the model in your browser.<br>" +
 				"This tool starts the server to run this website." +
-				"<p><p>Open the viewer by visiting the URL address below." +
+				"<p><p><b>Open the viewer by visiting the URL address below.</b>" +
 				"<p><p>Note, you can use this url from any device within your network.<br>" +
-				"Try preview on your mobile device."));
-		panel.add(new JTextField(url));
+				"Try preview on your mobile device." +
+				"<p><p>For preview of your textures, export your texture from <br>" +
+				"the template into <i>carbody.jpg</i> and <i>carbodyExtra0.jpg</i>";
+		JTextField descriptionField = new JTextField(description);
+		descriptionField.setEnabled(false);
+		descriptionField.setOpaque(false);
+		intro.add(new JLabel(description), BorderLayout.LINE_END);
+		frame.add(intro, BorderLayout.CENTER);
+		
+		
 		JButton startViewerButton = new JButton("Open Viewer");
 		startViewerButton.addActionListener(new ActionListener() {
 
@@ -66,14 +89,16 @@ public class ClayServer {
 				try {
 					openURL(new URI(url));
 				} catch (URISyntaxException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
 		});
+		JPanel panel = new JPanel();
+		JTextField urlField = new JTextField(url);
+		panel.add(urlField);
 		panel.add(startViewerButton);
-		panel.add(new JLabel("You need a Webbrowser supporting WebGL like Chrome or Firefox."));
-		frame.add(panel);
+		panel.add(new JLabel("<html><i>You need a Webbrowser supporting WebGL like Chrome or Firefox."));
+		frame.add(panel, BorderLayout.PAGE_END);
 
 		frame.pack();
 		frame.setVisible(true);
