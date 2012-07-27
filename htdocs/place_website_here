@@ -1,0 +1,5 @@
+Place the website you'd like to host in the server in this directory.
+This directory will be deployed within the exported jar.
+
+You can override URLs and point them to files outside of the jar by
+defining urlhandlers in the /res/config.ini
