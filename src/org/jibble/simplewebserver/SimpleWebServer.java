@@ -44,16 +44,17 @@ public class SimpleWebServer extends Thread {
         MIME_TYPES.put(".txt", text + "plain");
     }
     
-    public SimpleWebServer(File rootDir, int port) throws IOException {
+   public SimpleWebServer(File rootDir, int port) throws IOException {
+	   this(rootDir, port, new HashMap<String, String>());
+   }
+    
+    public SimpleWebServer(File rootDir, int port, Map<String, String> urlHandlers) throws IOException {
         _rootDir = rootDir.getCanonicalFile();
         if (!rootDir.isDirectory()) {
             _readFromJar = false;
         }
         _serverSocket = new ServerSocket(port);
-        _urlHandlers = new HashMap<String, String>();
-        addUrlHandler("/foo.txt", "/index.html");
-        addUrlHandler("/textures/IFM2009_16.jpg", "carbody.jpg");
-        addUrlHandler("/textures/IFM2009_16Extra0.jpg", "carbodyExtra0.jpg");
+        _urlHandlers = urlHandlers;
         start();
     }
     
@@ -96,7 +97,7 @@ public class SimpleWebServer extends Thread {
     }
     
     private boolean _readFromJar = true;
-    private HashMap<String, String> _urlHandlers;
+    private Map<String, String> _urlHandlers;
     private File _rootDir;
     private ServerSocket _serverSocket;
     private boolean _running = true;

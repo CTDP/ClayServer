@@ -81,7 +81,7 @@ public class RequestThread extends Thread {
             String path = request.substring(4, request.length() - 9);
             String decodedUrl = URLDecoder.decode(path, "UTF-8");
             
-            if(_readFromJar) {
+            if(_readFromJar || !_urlHandlers.containsKey(decodedUrl)) {
             	handleInputStream(reader, out, path, decodedUrl);
             } else {
             	handleFile(reader, out, path, decodedUrl);
@@ -110,7 +110,6 @@ public class RequestThread extends Thread {
 			decodedUrl = "/index.html";
 		}
 		
-		
 		InputStream is = RequestThread.class.getResourceAsStream(decodedUrl);
 		String contentType = null;
 		
@@ -133,8 +132,6 @@ public class RequestThread extends Thread {
 	    byte[] buffer = new byte[4096];
 	    int bytesRead;
 	    while ((bytesRead = reader.read(buffer)) != -1) {
-	    	System.out.println(bytesRead);
-	    	System.out.println(buffer);
 	        out.write(buffer, 0, bytesRead);
 	    }
 	    System.out.println("done");
@@ -151,9 +148,8 @@ public class RequestThread extends Thread {
 		// url handling, maybe with regex matching later
 		if(_urlHandlers.containsKey(decodedUrl)) {
 			file = new File(_urlHandlers.get(decodedUrl));
+			System.out.println(file.getAbsolutePath());
 		}
-		
-		System.out.println(file.getAbsolutePath());
 		
 		if (file.isDirectory()) {
 		    // Check to see if there is an index file in the directory.
