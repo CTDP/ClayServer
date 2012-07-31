@@ -70,7 +70,7 @@ public class ClayView extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					ClayServer.openURL(new URI(url));
+					MoreWebbableView.openURL(new URI(url));
 				} catch (URISyntaxException e1) {
 					e1.printStackTrace();
 				}

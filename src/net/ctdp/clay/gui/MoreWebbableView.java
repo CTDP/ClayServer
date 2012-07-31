@@ -2,6 +2,7 @@ package net.ctdp.clay.gui;
 
 import java.awt.Font;
 import java.io.File;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -10,8 +11,6 @@ import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.html.HTMLDocument;
-
-import net.ctdp.clay.ClayServer;
 
 public class MoreWebbableView extends JTextPane {
 
@@ -46,12 +45,32 @@ public class MoreWebbableView extends JTextPane {
 		public void hyperlinkUpdate(HyperlinkEvent e) {
 			if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 				try {
-					ClayServer.openURL(e.getURL().toURI());
+					openURL(e.getURL().toURI());
 				} catch (URISyntaxException e2) {
-					// TODO Auto-generated catch block
 					e2.printStackTrace();
 				}
 			}
+		}
+	}
+
+	public static void openURL(URI uri) {
+		if( !java.awt.Desktop.isDesktopSupported() ) {
+			System.err.println( "Desktop is not supported (fatal)" );
+			System.exit( 1 );
+		}
+
+		java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+
+		if( !desktop.isSupported( java.awt.Desktop.Action.BROWSE ) ) {
+			System.err.println( "Desktop doesn't support the browse action (fatal)" );
+			System.exit( 1 );
+		}
+
+		try {
+			desktop.browse( uri );
+		}
+		catch ( Exception e ) {
+			System.err.println( e.getMessage() );
 		}
 	}
 
