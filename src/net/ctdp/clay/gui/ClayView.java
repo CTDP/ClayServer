@@ -32,8 +32,6 @@ import net.ctdp.clay.ClayServer;
 
 public class ClayView extends JFrame {
 
-	private JTextPane descriptionField;
-
 	public ClayView(final String title, final String url) {
 		setTitle(title);
 		setPreferredSize(new Dimension(820, 370));
@@ -60,32 +58,8 @@ public class ClayView extends JFrame {
 		}
 
 		StyleSheet ss = new HTMLEditorKit().getStyleSheet();
-		descriptionField = new JTextPane();
-		// add a CSS rule to force body tags to use the default label font
-		// instead of the value in javax.swing.text.html.default.csss
-		Font font = UIManager.getFont("Label.font");
-		String bodyRule = "body { font-family: " + font.getFamily() + "; " +
-				"font-size: " + font.getSize() + "pt; }";
-
-		try {
-			File file = new File("res/guide.html");
-			URL descriptionUrl;
-			if(file.exists())
-				descriptionUrl = file.toURL();
-			else 
-				descriptionUrl = getClass().getResource("/res/guide.html");
-			descriptionField.setPage(descriptionUrl);
-		} 
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		((HTMLDocument)descriptionField.getDocument()).getStyleSheet().addRule(bodyRule);
-		descriptionField.setOpaque(false);
-		descriptionField.setEditable(false);
-		descriptionField.setFont(intro.getFont());
-		descriptionField.addHyperlinkListener(new HTMLListener());
-		intro.add(descriptionField, BorderLayout.CENTER);
+		JTextPane webView = new MoreWebbableView("res/guide.html");
+		intro.add(webView, BorderLayout.CENTER);
 
 		add(intro, BorderLayout.CENTER);
 
@@ -111,17 +85,4 @@ public class ClayView extends JFrame {
 		add(panel, BorderLayout.PAGE_END);
 	}
 	
-	private class HTMLListener implements HyperlinkListener {
-	      public void hyperlinkUpdate(HyperlinkEvent e) {
-	        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-	            try {
-	            	ClayServer.openURL(e.getURL().toURI());
-	            } catch (URISyntaxException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				}
-	        }
-	      }
-	    }
-
 }
