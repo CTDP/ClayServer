@@ -57,7 +57,6 @@ public class ClayView extends JFrame {
 
 		}
 
-		StyleSheet ss = new HTMLEditorKit().getStyleSheet();
 		JTextPane webView = new MoreWebbableView("res/guide.html");
 		intro.add(webView, BorderLayout.CENTER);
 

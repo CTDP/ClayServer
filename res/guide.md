@@ -11,4 +11,4 @@ For preview of your textures, export your texture from the template into *carbod
  
 <hr>
 
-[Webseite](http://www.ctdp.net/ifm2009.html) | [Documentation](http://readme.ctdp.net/ifm-template/index.html) | [Source Code](http://www.github.com/CTDP/ClayServer) | [Feedback](http://www.github.com/CTDP/ClayServer/issues)
+[Webseite](http://www.ctdp.net/ifm-2009.html) | [Documentation](http://readme.ctdp.net/ifm-template/index.html) | [Source Code](http://www.github.com/CTDP/ClayServer) | [Feedback](http://www.github.com/CTDP/ClayServer/issues)
