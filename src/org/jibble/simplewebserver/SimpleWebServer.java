@@ -42,6 +42,8 @@ public class SimpleWebServer extends Thread {
         MIME_TYPES.put(".html", text + "html");
         MIME_TYPES.put(".htm", text + "html");
         MIME_TYPES.put(".txt", text + "plain");
+        MIME_TYPES.put(".css", text + "css");
+        MIME_TYPES.put(".js", "application/javascript");
     }
     
    public SimpleWebServer(File rootDir, int port) throws IOException {
