@@ -15,8 +15,17 @@ public class ConfigParser extends AbstractIniParser {
 			String value, String comment) throws ParsingException {
 		if(group.equals("General")) {
 			// general settings
+			// TODO change to switch
 			if(key.equals("port")) {
 				config.port = Integer.parseInt(value);
+			} else if(key.equals("title")) {
+				config.title = value;
+			} else if(key.equals("introGraphic")) {
+				config.introGraphic = value;
+			} else if(key.equals("descriptionPage")) {
+				config.descriptionPage = value;
+			} else if(key.equals("openButtonText")) {
+				config.openButtonText = value;
 			}
 		} else if(group.equals("URLHandlers")) {
 			// urlhandlers setup

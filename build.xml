@@ -6,7 +6,7 @@
 	<property name="src.dir" location="${basedir}/src" /> 
     
     <target name="create_run_jar" depends="compile">
-        <jar destfile="/Users/danielsenff/Dropbox/IFM (1)/Sources/2D/templates_release/clayserver.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="/Users/danielsenff/Dropbox/IFM/Sources/2D/templates_release/clayserver.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="net.ctdp.clay.ClayServer"/>
                 <attribute name="Class-Path" value="."/>

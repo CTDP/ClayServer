@@ -3,15 +3,12 @@ package net.ctdp.clay.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -21,22 +18,34 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.UIManager;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.html.HTMLDocument;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.StyleSheet;
 
 import net.ctdp.clay.ClayServer;
+import net.ctdp.clay.io.Configuration;
 
+/**
+ * View UI
+ * @author danielsenff
+ *
+ */
 public class ClayView extends JFrame {
 
-	public ClayView(final String title, final String url) {
-		setTitle(title);
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private Configuration configuration;
+	
+	/**
+	 * @param configuration
+	 * @param url
+	 */
+	public ClayView(final Configuration configuration, final String url) {
+		setTitle(configuration.title);
 		setPreferredSize(new Dimension(820, 370));
 		setLayout(new BorderLayout());
 		setResizable(false);
+		this.configuration = configuration;
 
 		initComponents(url);
 
@@ -50,20 +59,19 @@ public class ClayView extends JFrame {
 		intro.setLayout(new BorderLayout());
 		intro.setBackground(Color.WHITE);
 		try {
-			InputStream is = ClayServer.class.getResourceAsStream("/res/intro.jpg");
+			InputStream is = ClayServer.class.getResourceAsStream(configuration.introGraphic);
 			ImageIcon imageIcon = new ImageIcon(ImageIO.read(is));
 			intro.add(new JLabel(imageIcon), BorderLayout.LINE_START);
 		} catch (IOException ex) {
 
 		}
 
-		JTextPane webView = new MoreWebbableView("res/guide.html");
+		JTextPane webView = new MoreWebbableView(configuration.descriptionPage);
 		intro.add(webView, BorderLayout.CENTER);
 
 		add(intro, BorderLayout.CENTER);
 
-
-		JButton startViewerButton = new JButton("Open Viewer");
+		JButton startViewerButton = new JButton(configuration.openButtonText);
 		startViewerButton.addActionListener(new ActionListener() {
 
 			@Override
