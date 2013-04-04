@@ -1,6 +1,6 @@
 # ClayServer
 
-This is part of the Clay-Model-Viewer developed by Daniel 'Dahie' Senff for CTDP.
+This is part of the Clay-Model-Viewer developed by Daniel 'Dahie' Senff for [CTDP][ctdp].
 This system aims to allow easy cross-platform preview of 3D models in your browser.
 In order to easily refresh and replace textures for preview, the website running
 the 3D-viewer is hosted locally. 
@@ -11,7 +11,7 @@ This website can be accessed via your browser or by any device in your local net
 Closing the app, closes the server without remains.
 
 The ClayServer sources here do not include the actualy model viewer. This will be
-made available somwhere else. 
+made available somewhere else. 
 
 ## Project structure
 

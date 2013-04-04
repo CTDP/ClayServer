@@ -77,9 +77,14 @@ public class RequestThread extends Thread {
                 // Invalid request type (no "GET")
                 sendError(out, 500, "Invalid Method.");
                 return;
-            }            
+            }
             String path = request.substring(4, request.length() - 9);
             String decodedUrl = URLDecoder.decode(path, "UTF-8");
+            // no support for parameter
+            if(decodedUrl.contains("?")) {
+            	decodedUrl = decodedUrl.substring(0, decodedUrl.indexOf("?"));
+            }
+            System.out.println(request);
             
             if(_readFromJar || !_urlHandlers.containsKey(decodedUrl)) {
             	handleInputStream(reader, out, path, decodedUrl);
@@ -125,16 +130,12 @@ public class RequestThread extends Thread {
 	        contentType = "application/octet-stream";
 	    }
 	    
-	    System.out.println("Send header");
-	    
 	    sendHeader(out, 200, contentType, -1, System.currentTimeMillis());
-	    System.out.println("header sent");
 	    byte[] buffer = new byte[4096];
 	    int bytesRead;
 	    while ((bytesRead = reader.read(buffer)) != -1) {
 	        out.write(buffer, 0, bytesRead);
 	    }
-	    System.out.println("done");
 	    reader.close();
 		
 	}
